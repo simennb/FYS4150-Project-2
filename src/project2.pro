@@ -3,10 +3,8 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
-LIBS += -llapack -lblas -larmadillo
-
 SOURCES += main.cpp \
-    jacobi.cpp
+    functions.cpp
 
 HEADERS += \
-    jacobi.h
+    functions.h
