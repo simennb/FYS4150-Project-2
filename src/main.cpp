@@ -4,6 +4,13 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    cout << "Hello World!" << endl;
-    return 0;
+    double epsilon = 1.0e-8;
+
+    int iterations = 0;
+
+    while(fabs(maxoffdiag) > epsilon && iterations < maxiterations){
+        maxoffdiag = max_offdiag(A, l, k, n);
+        rotate();
+        iterations++;
+    }
 }
