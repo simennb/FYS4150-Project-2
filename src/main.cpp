@@ -122,4 +122,5 @@ int main(int argc, char *argv[])
     delete[] A;
     delete[] R;
     delete[] V;
+
 }
