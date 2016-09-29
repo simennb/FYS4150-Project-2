@@ -26,7 +26,7 @@ void rotate(double ** A, double ** R, int k, int l, int n){
     /*
     Rotation function. Used to find cos and sin.
     */
-    double s, c;
+    double s, c; //sin and cos functions
     if( A[k][l] != 0.0) {
         double t, tau;
         tau = (A[l][l] - A[k][k])/(2*A[k][l]);
