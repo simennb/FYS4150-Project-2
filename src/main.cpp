@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
     /* Running Jacobi's algorithm */
     start = clock();
     /////////////////////////////////////////////
+    jacobi(A, R, n, epsilon);
     /////////////////////////////////////////////
     finish = clock();
 
@@ -110,9 +111,9 @@ int main(int argc, char *argv[])
         }*/
     }
 
-
-
-
+    for (int i = 0; i < n; i++){
+        cout << A[i][i] << endl;
+    }
     /* Freeing up memory */
     for (int i=0; i<n; i++)
     {
