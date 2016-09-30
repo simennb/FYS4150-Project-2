@@ -90,13 +90,32 @@ int main(int argc, char *argv[])
     time_jacobi = ((finish-start)/((double)CLOCKS_PER_SEC));
 
     /* Armadillo solving */
+    mat A_arma  = zeros<mat>(n,n);
+    vec V_arma  = zeros<vec>(n);
+    mat eigvecs = zeros<mat>(n,n);
+    vec eigvals = zeros<vec>(n);
+
+    /* setting values of A_arma to A and V_arma to V */
+    for (int i=0; i<n-1; i++)
+    {
+        A_arma(i,i) = A[i][i];
+        A_arma(i,i+1) = A[i][i+1];
+        A_arma(i+1,i) = A[i+1][i];
+        V_arma[i] = V[i];
+    }
+    A_arma(n-1,n-1) = A[n-1][n-1];
+    V_arma(n-1) = V[n-1];
+
     start = clock();
-    // maybe make function to create matrix to use or something
-    /////////////////////////////////////////////
-    /////////////////////////////////////////////
+    eig_sym(eigvals, eigvecs, A_arma);
     finish = clock();
 
     time_arma = ((finish-start)/((double)CLOCKS_PER_SEC));
+    for (int i=0; i<3; i++)
+    {
+        cout<<eigvals[i]<<endl;
+    }
+    //cout<<time_arma<<endl;
 
 
     /////////////////////////////////////////////
