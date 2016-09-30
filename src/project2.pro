@@ -6,7 +6,9 @@ CONFIG -= qt
 LIBS += -llapack -lblas -larmadillo
 
 SOURCES += main.cpp \
-    functions.cpp
+    functions.cpp \
+    unity.cpp \
 
 HEADERS += \
-    functions.h
+    functions.h \
+    unity.h

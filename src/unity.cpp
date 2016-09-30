@@ -3,6 +3,7 @@
 #include <iostream>
 
 void unity(){
+    int n = 10;
     double **AU = new double*[2];
     double **RU = new double*[2];
     for (int i=0; i<n; i++){
@@ -14,6 +15,6 @@ void unity(){
     AU[1][2] = 1;
     AU[2][1] = 1;
 
-
+    return;
 }
 
