@@ -1,7 +1,28 @@
 #include "functions.h"
 #include <cmath>
+#include <iostream>
 
-using namespace::std
+using namespace std;
+
+void jacobi(double ** A, double ** R, int n, double epsilon){
+    /*
+    Jacobis method
+    */
+    int k, l;
+    double max_iterations = (double) n * (double) n * (double) n;
+    int iterations = 0;
+    double maxoffdiag = max_offdiag(A, &k, &l, n);
+
+    while ( fabs(maxoffdiag) > epsilon && (double) iterations < max_iterations){
+        maxoffdiag = max_offdiag(A, &k, &l, n);
+        rotate(A, R, k, l, n);
+        iterations++;
+    }
+    cout << "Number of iterations " << iterations<< endl;
+    return;
+}
+
+
 
 double max_offdiag(double ** A, int * k, int * l, int n){
     /*
@@ -9,9 +30,9 @@ double max_offdiag(double ** A, int * k, int * l, int n){
     setting abs(a[k][l]) = max(abs[i][i+1])
     */
 
-    double max = 0.0
+    double max = 0.0;
     for (int i = 0; i < n; i++){
-        for (int j = i+1; j < n, j++) {
+        for (int j = i+1; j < n; j++) {
             if(fabs(A[i][j]) > max){
                 max = fabs(A[i][j]); //why not A[i][j]**2?
                 *l = i;
@@ -19,7 +40,7 @@ double max_offdiag(double ** A, int * k, int * l, int n){
             }
         }
     }
-    return max
+    return max;
 }
 
 void rotate(double ** A, double ** R, int k, int l, int n){
@@ -31,10 +52,10 @@ void rotate(double ** A, double ** R, int k, int l, int n){
         double t, tau;
         tau = (A[l][l] - A[k][k])/(2*A[k][l]);
         if (tau > 0) {
-            t = 1.0/(tau + sqrt(1.0 + tau*tau));
+            t = -tau + sqrt(1.0 + tau*tau); //want to keep t as small as possible
         }
         else {
-            t = -1.0/(-tau + sqrt(1.0 + tau*tau));
+            t = -tau - sqrt(1.0 + tau*tau); //if tau is negative, we must subtract t and visa versa
         }
         c = 1/sqrt(1 + t*t);
         s = t*c;
@@ -68,7 +89,7 @@ void rotate(double ** A, double ** R, int k, int l, int n){
         r_ik = R[i][k];
         r_il = R[i][l];
         R[i][k] = c*r_ik - s*r_il;
-        R[i][l] = c*r_il + s*r_ik
+        R[i][l] = c*r_il + s*r_ik;
     }
     return;
 }
