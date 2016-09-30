@@ -133,7 +133,10 @@ int main(int argc, char *argv[])
     for (int i = 0; i < n; i++){
         cout << A[i][i] << endl;
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/heads/branch3
     /* Freeing up memory */
     for (int i=0; i<n; i++)
     {
