@@ -1,0 +1,3 @@
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000244 t_arma =     0.0003
+
