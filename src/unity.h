@@ -1,11 +1,6 @@
 #ifndef UNITY_H
 #define UNITY_H
 
-
-class unity
-{
-public:
-    unity();
-};
-
+void unity_eig(double epsilon);
+void unity_max();
 #endif // UNITY_H

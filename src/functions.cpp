@@ -49,6 +49,9 @@ double max_offdiag(double ** A, int * k, int * l, int n){
     /*
     Choosing the maximum nondiagonal element
     setting abs(a[k][l]) = max(abs[i][i+1])
+    Assuming that A is symetric round the diagonal
+    and therefore the second loop goes only through
+    j+1.
     */
 
     double max = 0.0;
@@ -107,6 +110,7 @@ void rotate(double ** A, double ** R, int k, int l, int n){
             A[l][i] = A[i][l];
         }
         //new eigenvectors
+
         r_ik = R[i][k];
         r_il = R[i][l];
         R[i][k] = c*r_ik - s*r_il;

@@ -26,6 +26,8 @@ int main(int argc, char *argv[])
         /* If running unit tests, making sure that no matrices/arrays initialized */
         //unit_testing(); or something when functions made
 //        unity_eig(epsilon);
+        unity_eig(epsilon);
+        unity_max();
         exit(1);
     }
     /* Initializing some variables */
