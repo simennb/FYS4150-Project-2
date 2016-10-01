@@ -6,6 +6,7 @@
 #include <armadillo>
 #include <time.h>
 #include "functions.h"
+#include "unity.h"
 
 using namespace std;
 using namespace arma;
@@ -185,8 +186,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < n; i++){
         cout << A[i][i] << endl;
     }
-
-
+    unity_eig(epsilon);
     /////////////////////////////////////////////
     ///            Writing to file            ///
     /////////////////////////////////////////////

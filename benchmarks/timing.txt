@@ -1,3 +1,48 @@
 N=    10 rho_min=   0 rho_max=  10
 t_jacobi =   0.000244 t_arma =     0.0003
 
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000115 t_arma =   0.001281
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000488 t_arma =   0.000725
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =    9.3e-05 t_arma =   0.000193
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000115 t_arma =   0.000176
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =    7.9e-05 t_arma =   0.000216
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000155 t_arma =   0.000314
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000255 t_arma =   0.000171
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000103 t_arma =   0.000169
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000111 t_arma =   0.000142
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000118 t_arma =   0.000188
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000201 t_arma =   0.000319
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =    7.6e-05 t_arma =    0.00011
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000108 t_arma =   0.000218
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000379 t_arma =   0.000699
+
+N=    10 rho_min=   0 rho_max=  10
+t_jacobi =   0.000246 t_arma =   0.000706
+

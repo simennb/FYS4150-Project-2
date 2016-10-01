@@ -14,8 +14,8 @@ void jacobi(double ** A, double ** R, int n, double epsilon){
     double maxoffdiag = max_offdiag(A, &k, &l, n);
 
     while ( fabs(maxoffdiag) > epsilon && (double) iterations < max_iterations){
-        maxoffdiag = max_offdiag(A, &k, &l, n);
         rotate(A, R, k, l, n);
+        maxoffdiag = max_offdiag(A, &k, &l, n);
         iterations++;
     }
     cout << "Number of iterations " << iterations<< endl;
