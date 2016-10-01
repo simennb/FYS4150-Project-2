@@ -1,20 +1,44 @@
 #include "functions.h"
 #include <cmath>
 #include <iostream>
+#include <armadillo>
+#include <fstream>
+#include <string>
+#include <iomanip>
 
 using namespace std;
+using namespace arma;
 
 void jacobi(double ** A, double ** R, int n, double epsilon){
     /*
     Jacobis method
     */
+    /* Setting up the eigenvector matrix */
+    for (int i=0; i<n; i++)
+    {
+        for (int j=0; j<n; j++)
+        {
+            if (i == j)
+            {
+                R[i][j] = 1.0;
+            }
+            else
+            {
+                R[i][j] = 0.0;
+            }
+        }
+    }
+
     int k, l;
     double max_iterations = (double) n * (double) n * (double) n;
     int iterations = 0;
     double maxoffdiag = max_offdiag(A, &k, &l, n);
 
     while ( fabs(maxoffdiag) > epsilon && (double) iterations < max_iterations){
+<<<<<<< HEAD
         // cout << "iterations = " << iterations << endl;
+=======
+>>>>>>> refs/heads/master
         rotate(A, R, k, l, n);
         maxoffdiag = max_offdiag(A, &k, &l, n);
         iterations++;
@@ -61,7 +85,7 @@ void rotate(double ** A, double ** R, int k, int l, int n){
         else {
             t = -tau - sqrt(1.0 + tau*tau); //if tau is negative, we must subtract t and visa versa
         }
-        c = 1/sqrt(1 + t*t);
+        c = 1.0/sqrt(1 + t*t);
         s = t*c;
     }
     else{

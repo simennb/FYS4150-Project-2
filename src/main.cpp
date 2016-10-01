@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <string>
 #include <fstream>
+#include <algorithm>
 #include <cmath>
 #include <armadillo>
 #include <time.h>
@@ -24,6 +25,7 @@ int main(int argc, char *argv[])
     {
         /* If running unit tests, making sure that no matrices/arrays initialized */
         //unit_testing(); or something when functions made
+//        unity_eig(epsilon);
         exit(1);
     }
     /* Initializing some variables */
@@ -52,6 +54,7 @@ int main(int argc, char *argv[])
     double *V = new double[n];    /* potential array */
     double *rho = new double[n];  /* rho array */
 
+<<<<<<< HEAD
     /* Setting up the eigenvector matrix */
     for (int i=0; i<n; i++)
     {
@@ -67,6 +70,8 @@ int main(int argc, char *argv[])
             }
         }
     }
+=======
+>>>>>>> refs/heads/master
 
     /* Initializing rho-array */
     for (int i=1; i<n+1; i++)
@@ -119,14 +124,24 @@ int main(int argc, char *argv[])
         V_arma(n-1) = V[n-1];
 
         start = clock();
-        eig_sym(eigvals, eigvecs, A_arma);
+        eig_sym(eigvals, eigvecs, A_arma); /* solving with armadillo */
         finish = clock();
-
         time_arma = ((finish-start)/((double)CLOCKS_PER_SEC));
+<<<<<<< HEAD
         //for (int i=0; i<3; i++)
         //{
         //   cout<<eigvals[i]<<endl;
         //}
+=======
+
+        /* Creating array of eigenvalues found by jacobi in order to sort them */
+        double lambda_jacobi[n];
+        for (int i=0; i<n; i++)
+        {
+            lambda_jacobi[i] = A[i][i];
+        }
+        sort(lambda_jacobi, lambda_jacobi + n);
+>>>>>>> refs/heads/master
 
         /* Writing to file */
         ofstream ofile;
@@ -137,7 +152,7 @@ int main(int argc, char *argv[])
         ofile<<"  eigvals jacobi"<<"  eigvals armadillo"<<endl;
         for (int i=0; i<5; i++) /* write first 5 eigenvalues to file */
         {
-            ofile<<setw(15)<<setprecision(8)<<A[i][i]<<setw(15)<<setprecision(8)<<eigvals[i]<<endl;
+            ofile<<setw(15)<<setprecision(8)<<lambda_jacobi[i]<<setw(15)<<setprecision(8)<<eigvals[i]<<endl;
         }
         ofile.close();
 
@@ -154,34 +169,66 @@ int main(int argc, char *argv[])
     /////////////////////////////////////////////
     if (strcmp(argv[3], "interact") == 0)
     {
+        /* Initializing file to save eigenvectors */
+        ofstream ofile;
+        ofile.open("../benchmarks/eigenvectors_int_n"+to_string(n)+".dat");
+        ofile<<setiosflags(ios::showpoint | ios::uppercase);
+        ofile<<"N= "<<setw(5)<<n;
+        ofile<<" rho_min= "<<setw(3)<<rho_0<<" rho_max= "<<setw(3)<<rho_max<<endl;
         double omega_r[4] = {0.01, 0.5, 1.0, 5.0}; // small enough to not worry about memory allocation
 
+<<<<<<< HEAD
         for (int i=0; i<4; i++) /* going through the different omega_r values */
+=======
+        for (int omega_index=0; omega_index<4; omega_index++) /* going through the different omega_r values */
+>>>>>>> refs/heads/master
         {
             /* Setting the potential in the interacting case */
             for (int j=0; j<n; j++)
             {
-                V[j] = pow((rho[j]*omega_r[i]), 2) - 1.0/rho[j];
+                V[j] = pow((rho[j]*omega_r[omega_index]), 2) - 1.0/rho[j];
             }
 
             /* Filling matrix A with values */
-            for (int i=0; i<n-1; i++)
+            for (int j=0; j<n-1; j++)
             {
-                A[i][i] = 2.0*h_marked + V[i];  /* diagonal elements */
-                A[i][i+1] = -h_marked;          /* non diagonal elements */
-                A[i+1][i] = -h_marked;
+                A[j][j] = 2.0*h_marked + V[j];  /* diagonal elements */
+                A[j][j+1] = -h_marked;          /* non diagonal elements */
+                A[j+1][j] = -h_marked;
             }
             A[n-1][n-1] = 2.0*h_marked + V[n-1];
 
             /* Running Jacobi's algorithm */
             jacobi(A, R, n, epsilon);
 
+            /* Finding index corresponding to lowest eig.val / ground state */
+            double min_lambda = A[0][0];  /* initializing to first lambda */
+            int min_index = 0;
+            for (int j=0; j<n; j++)
+            {
+                if (A[j][j] < min_lambda)
+                {
+                    min_lambda = A[j][j];
+                    min_index = j;
+                }
+            }
+
             /* Writing results to file */
-            //ofstream ofile;
-
-
+            ofile<<"omega_r "<<setw(5)<<omega_r[omega_index]<<endl;
+            int step_size = 1;
+            int max_vals = 100;
+            if (n > max_vals) /* in order to not save too many values to file */
+            {
+                step_size = (int)(n/((double)max_vals))+1;
+            }
+            for (int j=0; j<n; j+=step_size)
+            {
+                ofile<<setw(20)<<setprecision(16)<<R[j][min_index]<<endl;
+            }
         }
+        ofile.close();
     }
+<<<<<<< HEAD
     /////////////////////////////////////////////
     ///              Unity tests              ///
     /////////////////////////////////////////////
@@ -195,6 +242,8 @@ int main(int argc, char *argv[])
     ofstream outfile;
 
 
+=======
+>>>>>>> refs/heads/master
 
     /* Freeing up memory */
     for (int i=0; i<n; i++)
