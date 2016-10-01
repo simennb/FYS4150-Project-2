@@ -26,6 +26,8 @@ int main(int argc, char *argv[])
         /* If running unit tests, making sure that no matrices/arrays initialized */
         //unit_testing(); or something when functions made
 //        unity_eig(epsilon);
+        unity_eig(epsilon);
+        unity_max();
         exit(1);
     }
     /* Initializing some variables */
@@ -54,24 +56,6 @@ int main(int argc, char *argv[])
     double *V = new double[n];    /* potential array */
     double *rho = new double[n];  /* rho array */
 
-<<<<<<< HEAD
-    /* Setting up the eigenvector matrix */
-    for (int i=0; i<n; i++)
-    {
-        for (int j=0; j<n; j++)
-        {
-            if (i == j)
-            {
-                R[i][i] = 1.0;
-            }
-            else
-            {
-                R[i][j] = 0.0;
-            }
-        }
-    }
-=======
->>>>>>> refs/heads/master
 
     /* Initializing rho-array */
     for (int i=1; i<n+1; i++)
@@ -127,12 +111,6 @@ int main(int argc, char *argv[])
         eig_sym(eigvals, eigvecs, A_arma); /* solving with armadillo */
         finish = clock();
         time_arma = ((finish-start)/((double)CLOCKS_PER_SEC));
-<<<<<<< HEAD
-        //for (int i=0; i<3; i++)
-        //{
-        //   cout<<eigvals[i]<<endl;
-        //}
-=======
 
         /* Creating array of eigenvalues found by jacobi in order to sort them */
         double lambda_jacobi[n];
@@ -141,7 +119,6 @@ int main(int argc, char *argv[])
             lambda_jacobi[i] = A[i][i];
         }
         sort(lambda_jacobi, lambda_jacobi + n);
->>>>>>> refs/heads/master
 
         /* Writing to file */
         ofstream ofile;
@@ -177,11 +154,7 @@ int main(int argc, char *argv[])
         ofile<<" rho_min= "<<setw(3)<<rho_0<<" rho_max= "<<setw(3)<<rho_max<<endl;
         double omega_r[4] = {0.01, 0.5, 1.0, 5.0}; // small enough to not worry about memory allocation
 
-<<<<<<< HEAD
-        for (int i=0; i<4; i++) /* going through the different omega_r values */
-=======
         for (int omega_index=0; omega_index<4; omega_index++) /* going through the different omega_r values */
->>>>>>> refs/heads/master
         {
             /* Setting the potential in the interacting case */
             for (int j=0; j<n; j++)
@@ -228,22 +201,6 @@ int main(int argc, char *argv[])
         }
         ofile.close();
     }
-<<<<<<< HEAD
-    /////////////////////////////////////////////
-    ///              Unity tests              ///
-    /////////////////////////////////////////////
-    unity_eig(epsilon);
-    unity_max();
-
-    /////////////////////////////////////////////
-    ///            Writing to file            ///
-    /////////////////////////////////////////////
-
-    ofstream outfile;
-
-
-=======
->>>>>>> refs/heads/master
 
     /* Freeing up memory */
     for (int i=0; i<n; i++)

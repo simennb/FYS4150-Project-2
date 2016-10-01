@@ -35,10 +35,6 @@ void jacobi(double ** A, double ** R, int n, double epsilon){
     double maxoffdiag = max_offdiag(A, &k, &l, n);
 
     while ( fabs(maxoffdiag) > epsilon && (double) iterations < max_iterations){
-<<<<<<< HEAD
-        // cout << "iterations = " << iterations << endl;
-=======
->>>>>>> refs/heads/master
         rotate(A, R, k, l, n);
         maxoffdiag = max_offdiag(A, &k, &l, n);
         iterations++;
@@ -105,7 +101,6 @@ void rotate(double ** A, double ** R, int k, int l, int n){
     A[l][k] = 0;
 
     for (int i = 0; i <n; i++){
-        //cout << i << endl;
         if(i != k && i != l) {
             a_ik = A[i][k];
             a_il = A[i][l];
