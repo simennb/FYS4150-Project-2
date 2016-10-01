@@ -55,11 +55,11 @@ int main(int argc, char *argv[])
     /* Setting up the eigenvector matrix */
     for (int i=0; i<n; i++)
     {
-        for (int j=0; i<n; i++)
+        for (int j=0; j<n; j++)
         {
             if (i == j)
             {
-                R[i][j] = 1.0;
+                R[i][i] = 1.0;
             }
             else
             {
@@ -123,10 +123,10 @@ int main(int argc, char *argv[])
         finish = clock();
 
         time_arma = ((finish-start)/((double)CLOCKS_PER_SEC));
-        for (int i=0; i<3; i++)
-        {
-            cout<<eigvals[i]<<endl;
-        }
+        //for (int i=0; i<3; i++)
+        //{
+        //   cout<<eigvals[i]<<endl;
+        //}
 
         /* Writing to file */
         ofstream ofile;
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
     {
         double omega_r[4] = {0.01, 0.5, 1.0, 5.0}; // small enough to not worry about memory allocation
 
-        for (int i=0; i<n; i++) /* going through the different omega_r values */
+        for (int i=0; i<4; i++) /* going through the different omega_r values */
         {
             /* Setting the potential in the interacting case */
             for (int j=0; j<n; j++)
@@ -182,11 +182,12 @@ int main(int argc, char *argv[])
 
         }
     }
-
-    for (int i = 0; i < n; i++){
-        cout << A[i][i] << endl;
-    }
+    /////////////////////////////////////////////
+    ///              Unity tests              ///
+    /////////////////////////////////////////////
     unity_eig(epsilon);
+    unity_max();
+
     /////////////////////////////////////////////
     ///            Writing to file            ///
     /////////////////////////////////////////////
