@@ -1,21 +1,42 @@
 #include "functions.h"
 #include <cmath>
 #include <iostream>
+#include <armadillo>
+#include <fstream>
+#include <string>
+#include <iomanip>
 
 using namespace std;
+using namespace arma;
 
 void jacobi(double ** A, double ** R, int n, double epsilon){
     /*
     Jacobis method
     */
+    /* Setting up the eigenvector matrix */
+    for (int i=0; i<n; i++)
+    {
+        for (int j=0; j<n; j++)
+        {
+            if (i == j)
+            {
+                R[i][j] = 1.0;
+            }
+            else
+            {
+                R[i][j] = 0.0;
+            }
+        }
+    }
+
     int k, l;
     double max_iterations = (double) n * (double) n * (double) n;
     int iterations = 0;
     double maxoffdiag = max_offdiag(A, &k, &l, n);
 
     while ( fabs(maxoffdiag) > epsilon && (double) iterations < max_iterations){
-        maxoffdiag = max_offdiag(A, &k, &l, n);
         rotate(A, R, k, l, n);
+        maxoffdiag = max_offdiag(A, &k, &l, n);
         iterations++;
     }
     cout << "Number of iterations " << iterations<< endl;
@@ -57,12 +78,12 @@ void rotate(double ** A, double ** R, int k, int l, int n){
         else {
             t = -tau - sqrt(1.0 + tau*tau); //if tau is negative, we must subtract t and visa versa
         }
-        c = 1/sqrt(1 + t*t);
+        c = 1.0/sqrt(1 + t*t);
         s = t*c;
     }
     else{
         c = 1.0;
-        s = 1.0;
+        s = 0.0;
     }
     /*
     I don't quite understand this part, ask at group session
