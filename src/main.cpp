@@ -21,15 +21,7 @@ int main(int argc, char *argv[])
         cout<<" task : noninteract, interact, or unit_test"<<endl;
         exit(1);
     }
-    if (strcmp(argv[3], "unit_tests") == 0)
-    {
-        /* If running unit tests, making sure that no matrices/arrays initialized */
-        //unit_testing(); or something when functions made
-//        unity_eig(epsilon);
-        unity_eig(epsilon);
-        unity_max();
-        exit(1);
-    }
+
     /* Initializing some variables */
     int n = atoi(argv[1]);
     double rho_max = atof(argv[2]);
@@ -200,6 +192,31 @@ int main(int argc, char *argv[])
             }
         }
         ofile.close();
+    }
+
+    if (strcmp(argv[3], "unit_tests") == 0)
+    {
+        /* If running unit tests, making sure that no matrices/arrays initialized */
+        //unit_testing(); or something when functions made
+//        unity_eig(epsilon);
+        ofstream unit_ofile;
+        unit_ofile.open("../benchmarks/unittest.txt");
+        unit_ofile<<setiosflags(ios::showpoint | ios::uppercase);
+
+        int test_counter = 0;
+
+        unity_eig(&test_counter, epsilon);
+        unity_max(&test_counter);
+        unity_init_ortho(A, R, V, rho, h_marked, n, epsilon, &test_counter);
+
+
+        cout << test_counter << " out of 3 tests passed" << endl;
+
+        unit_ofile.close();
+        unit_ofile.open("../benchmarks/unittest.txt", ios_base::app);
+        unit_ofile << test_counter << " out of 3 tests passed" << endl;
+        unit_ofile.close();
+        exit(1);
     }
 
     /* Freeing up memory */
