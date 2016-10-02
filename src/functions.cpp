@@ -1,4 +1,5 @@
 #include "functions.h"
+#include "unity.h"
 #include <cmath>
 #include <iostream>
 #include <armadillo>
@@ -13,6 +14,7 @@ void jacobi(double ** A, double ** R, int n, double epsilon){
     /*
     Jacobis method
     */
+
     /* Setting up the eigenvector matrix */
     for (int i=0; i<n; i++)
     {
@@ -29,11 +31,13 @@ void jacobi(double ** A, double ** R, int n, double epsilon){
         }
     }
 
+    /* Initializing some variables */
     int k, l;
     double max_iterations = (double) n * (double) n * (double) n;
     int iterations = 0;
     double maxoffdiag = max_offdiag(A, &k, &l, n);
 
+    /* Rotates the matrix A as long as it has any non-diagonal non-zero elements*/
     while ( fabs(maxoffdiag) > epsilon && (double) iterations < max_iterations){
         rotate(A, R, k, l, n);
         maxoffdiag = max_offdiag(A, &k, &l, n);
@@ -58,7 +62,7 @@ double max_offdiag(double ** A, int * k, int * l, int n){
     for (int i = 0; i < n; i++){
         for (int j = i+1; j < n; j++) {
             if(fabs(A[i][j]) > max){
-                max = fabs(A[i][j]); //why not A[i][j]**2?
+                max = fabs(A[i][j]);
                 *l = i;
                 *k = j;
             }
@@ -88,18 +92,18 @@ void rotate(double ** A, double ** R, int k, int l, int n){
         c = 1.0;
         s = 0.0;
     }
-    /*
-    I don't quite understand this part, ask at group session
-    */
+
     double a_kk, a_ll, a_il, a_ik, r_ik, r_il;
     a_kk = A[k][k];
     a_ll = A[l][l];
 
+    //finidng diagonal elements
     A[k][k] = c*c*a_kk - 2.0*c*s*A[k][l] + s*s*a_ll;
     A[l][l] = s*s*a_kk + 2.0*s*c*A[k][l] + c*c*a_ll;
     A[k][l] = 0;
     A[l][k] = 0;
 
+    //finding non-diagonal elements
     for (int i = 0; i <n; i++){
         if(i != k && i != l) {
             a_ik = A[i][k];
