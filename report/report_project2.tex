@@ -143,7 +143,7 @@ Starting our journey to write equation \eqref{eq:dimless_schroedinger} as an eig
 \begin{align*}
   u'' = \frac{u(\rho+h)-2u(\rho)+u(\rho-h)}{h^2}+\mathcal{O}(h^2)
 \end{align*}
-where $h$ is our step length. We define minimum and maximum values for $\rho$, $\rho_{\text{min}} = 0$ and $\rho_{\text{max}}$, as we cannot set $\rho_{\text{max}} = \infty$. Next, we split this interval into $N$ number of mesh points, so that we can define the step length as
+where $h$ is our step length. We define minimum and maximum values for $\rho$, $\rho_{\text{min}} = 0$ and $\rho_{\text{max}}$, as we cannot set $\rho_{\text{max}} = \infty$. When setting $\rho_{\text{max}}$, we need to make sure that it is set high enough so that the square of the wavefunction $u$ is small near $\rho_{\text{max}}$ for accuracy of the solution. Next, we split this interval into $N$ number of mesh points, so that we can define the step length as
 \begin{align*}
   h = \frac{\rho_N-\rho_0}{N}
 \end{align*}
@@ -157,23 +157,68 @@ Now we can rewrite the second derivative as
 \end{align*}
 Using this, we can rewrite the dimensionless Schrödinger equation \eqref{eq:dimless_schroedinger} as a discretized equation.
 \begin{align*}
-  -\frac{u_{i+1}-2u_i+u_{i-1}}{h^2} + \rho_i^2u_i = -\frac{u_{i+1}-2u_i+u_{i-1}}{h^2} + V_iu_i = \lambda u_i 
+  -\frac{u_{i+1}-2u_i+u_{i-1}}{h^2} + \rho_i^2u_i = -\frac{u_{i+1}-2u_i+u_{i-1}}{h^2} + V_iu_i = \lambda u_i \numberthis\label{eq:discretized_schroedinger}
 \end{align*}
-where $V_i = \rho_i^2$ is the harmonic oscillator potential. We can represent the left-hand side as a matrix multiplied by a vector $u$
-\subsubsection*{Interacting case}
+where $V_i = \rho_i^2$ is the harmonic oscillator potential. From the previous project, we recall that we can represent equation \eqref{eq:discretized_schroedinger} in terms of a tridiagonal matrix, where the diagonal elements are given by
 \begin{align*}
-  V(\rho) = \omega_r^2\rho^2 + 1/\rho
+  d_i = \frac{2}{h^2} + V_i = \frac{2}{h^2} + \rho_i^2
 \end{align*}
+and the non-diagonal matrix elements
+\begin{align*}
+  e_i = -\frac{1}{h^2}
+\end{align*}
+We notice that in this case, the non-diagonal matrix elements are constant. Using this, we can now write the Schrödinger equation as
+\begin{align*}
+  d_iu_i + e_{i-1}u_{i-1} + e_{i+1}u_{i+1} = \lambda u_i
+\end{align*}
+So that we now have the following eigenvalue equation
+\begin{align*}
+\ppmat{\frac{2}{h^2}+V_1&-\frac{1}{h^2}&0&\dots&0\\
+    -\frac{1}{h^2}&\frac{2}{h^2}+V_2&-\frac{1}{h^2}&0&\dots\\
+    \dots&\dots&\dots&\dots&0\\
+    \dots&\dots&-\frac{1}{h^2}&\frac{2}{h^2}+V_{N-2}&-\frac{1}{h^2}\\
+    0&\dots&0&-\frac{1}{h^2}&\frac{2}{h^2}+V_{N-1}}
+  \ppmat{u_1\\u_2\\\dots\\u_{N-2}\\u_{N-1}} = \lambda
+  \ppmat{u_1\\u_2\\\dots\\u_{N-2}\\u_{N-1}} \numberthis\label{eq:eigval_eq}
+\end{align*}
+which is what we want to solve by using Jacobi's method.
+\subsubsection*{Interacting case}
+The eigenvalue equation \eqref{eq:eigval_eq} was derived by assuming one electron in a harmonic oscillator potential. For two electrons with no repulsive Coulomb interaction, we have the following Schrödinger equation
+\begin{align*}
+  \bigg(-\frac{\hbar^2}{2m}\frac{d^2}{dr_1^2} - \frac{\hbar^2}{2m}\frac{d^2}{dr_2^2} + \frac{1}{2}kr_1^2 + \frac{1}{2}kr_2^2\bigg)u(r_1,r_2) = E^{(2)}u(r_1,r_2)
+\end{align*}
+With no interaction, this can be written out as the product of two single-electron wave functions, like we did earlier. Introducing relative coordinates $\mathbf{r} = \mathbf{r_1} - \mathbf{r_2}$ and center-of-mass coordinate $\mathbf{R} = 1/2(\mathbf{r_1}+\mathbf{r_2})$, and adding the repulsive Coulomb interaction between the two electrons to our potential
+\begin{align*}
+  V(r_1,r_2) = \frac{\beta e^2}{|\mathbf{r_1}-\mathbf{r_2}|} = \frac{\beta e^2}{r}
+\end{align*}
+So that we get the following radial Schrödinger equation (omitting the center-of-mass motion)
+\begin{align*}
+  \bigg(-\frac{\hbar^2}{m}\frac{d^2}{dr^2} + \frac{1}{4}kr^2 + \frac{\beta e^2}{r}\bigg)\psi(r) = E_r\psi(r)\\
+\end{align*}
+This is quite similar to the equation \eqref{eq:radial_schroedinger} we found earlier, and we can likewise introduce a dimensionless variable $\rho = r/\alpha$, and rewrite Schrödinger's equation as
+\begin{align*}
+  -\frac{d^2}{d\rho^2}\psi(\rho) + \omega_r^2\rho^2\psi(\rho) + \frac{1}{\rho}\psi(\rho) = \lambda\psi(\rho)
+\end{align*}
+So we see that the only thing we have to modify when adding the repulsive coloumb interaction is to change the potential from $\rho^2$ to $\omega_r\rho^2 + 1/\rho$, where we treat $\omega_r$ as a parameter reflecting the strength of the harmonic oscillator potential. We will later look at how the wave function behaves for different values of $\omega_r$.
 \subsubsection{Jacobi's method}
-\subsection{Experimental?}
+\subsection{Experimental}
+The programs used in this project can be found in the GitHub repository \cite{Github}, in the \texttt{/src/} folder. When running the program, it takes 3 command line arguments, $N$, $\rho_{\text{max}}$ and \texttt{mode}. The program has three different runmodes, which we will discuss in some more detail. The text-files saved by the program lies in the \texttt{/benchmarks/} folder, while plots are in \texttt{/figures/}.
+\subsubsection{Non-interacting case}
+Setting \texttt{mode} to \texttt{non-interact} runs the program with specified dimension and $\rho_{\text{max}}$, and stores the 5 lowest eigenvalues (calculated both by Jacobi's method and Armadillo's \texttt{eig\_sym()} function) in a file \texttt{eigenvalues\_noint\_n<N>.dat}. The execution time for both methods are appended to the file \texttt{timing.txt}.
+\subsubsection{Interacting case}
+Setting \texttt{mode} to \texttt{interact} runs the program for 4 different values of $\omega_r$ (0.01, 0.5, 1.0, 5.0) with the Coulomb interaction added.\\The eigenvector for the ground state is written to the file \texttt{eigenvectors\_int\_n<N>.dat}
+\subsubsection{Unit tests}
+Setting \texttt{mode} to \texttt{unit\_tests} runs three unit tests on the different modules in our program, and the result from the tests is written to the file \texttt{unittest.txt}.
+\\\\\red{add the different unit tests, and what they do}
 \subsection{Results}
-\subsection{Discussion}
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{../figures/eigvec_interact_n100.png}
   \caption{Plot of the eigenvectors for the interacting case for $n=100$}
   \label{fig:eigvec100}
 \end{figure}
+\subsection{Discussion}
+
 \subsection{Conclusion}
 \bibliography{references}
 \end{document}
