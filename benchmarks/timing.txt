@@ -317,3 +317,6 @@ N=   100 rho_min=   0 rho_max=  10
 t_jacobi =   0.286111 t_arma =   0.001991
 >>>>>>> refs/heads/master
 
+N=   500 rho_min=   0 rho_max=  10
+t_jacobi =  172.11695 t_arma =   0.090884
+

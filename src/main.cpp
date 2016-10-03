@@ -15,10 +15,10 @@ using namespace arma;
 int main(int argc, char *argv[])
 {
     if (argc < 4){
-        cout<<"Usage: "<<argv[0]<<" dim"<<" rho_max"<<" task"<<endl;
+        cout<<"Usage: "<<argv[0]<<" dim"<<" rho_max"<<" mode"<<endl;
         cout<<" dim : dimensionality of matrix A"<<endl;
         cout<<" rho_max : boundary for rho"<<endl;
-        cout<<" task : noninteract, interact, or unit_test"<<endl;
+        cout<<" mode : non-interact, interact, or unit_tests"<<endl;
         exit(1);
     }
 
