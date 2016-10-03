@@ -3,11 +3,13 @@ import numpy as np
 rc('font',**{'family':'serif'}) 
 
 n = 100
-
+interact = 'two-noint' # or 'two-int'
+interact = 'two-int'
 psi = zeros((4,n))
 omega_r = []
 
-filename = '../benchmarks/eigenvectors_int_n%d.dat'%n
+
+filename = '../benchmarks/eigenvectors_%s_n%d.dat'%(interact,n)
 data = open(filename,'r')
 count1 = 0
 count2 = 0
@@ -36,5 +38,5 @@ xlabel(r'$\rho$',size=18)
 ylabel(r'$|\Psi(\rho)|^2$',size=18)
 legend(fontsize=15)
 grid('on')
-savefig('../figures/eigvec_interact_n%d.png'%n)
+savefig('../figures/eigvec_%s_n%d.png'%(interact,n))
 show()

@@ -15,10 +15,13 @@ using namespace arma;
 int main(int argc, char *argv[])
 {
     if (argc < 4){
-        cout<<"Usage: "<<argv[0]<<" dim"<<" rho_max"<<" task"<<endl;
+        cout<<"Usage: "<<argv[0]<<" dim"<<" rho_max"<<" mode"<<endl;
         cout<<" dim : dimensionality of matrix A"<<endl;
         cout<<" rho_max : boundary for rho"<<endl;
-        cout<<" task : noninteract, interact, or unit_test"<<endl;
+        cout<<" mode : one, two-noint, two-int, or unit-test"<<endl;
+        cout<<"   one : one electron, no coulomb interaction"<<endl;
+        cout<<"   two-noint : two electrons, no coulomb interaction"<<endl;
+        cout<<"   two-int : two electrons, repulsive coulomb interaction"<<endl;
         exit(1);
     }
 
@@ -56,9 +59,9 @@ int main(int argc, char *argv[])
     }
 
     /////////////////////////////////////////////
-    ///         Non-interacting case          ///
+    ///     One electron, no interaction      ///
     /////////////////////////////////////////////
-    if (strcmp(argv[3], "non-interact") == 0)
+    if (strcmp(argv[3], "one") == 0)
     {
         /* Setting the potential in the non-interacting case */
         for (int i=0; i<n; i++)
@@ -134,13 +137,20 @@ int main(int argc, char *argv[])
     }
 
     /////////////////////////////////////////////
-    ///           Interacting case            ///
+    ///          Two electron case            ///
     /////////////////////////////////////////////
-    if (strcmp(argv[3], "interact") == 0)
+    if (strcmp(argv[3], "two-noint") == 0 || strcmp(argv[3], "two-int") == 0)
     {
+        int interaction;  /* if we have coulomb interaction or not */
+        if (strcmp(argv[3], "two-int") == 0) {
+            interaction = 1;  /* repulsive coulomb interaction */
+        }
+        else {
+            interaction = 0;  /* no coulomb interaction */
+        }
         /* Initializing file to save eigenvectors */
         ofstream ofile;
-        ofile.open("../benchmarks/eigenvectors_int_n"+to_string(n)+".dat");
+        ofile.open("../benchmarks/eigenvectors_"+string(argv[3])+"_n"+to_string(n)+".dat");
         ofile<<setiosflags(ios::showpoint | ios::uppercase);
         ofile<<"N= "<<setw(5)<<n;
         ofile<<" rho_min= "<<setw(3)<<rho_0<<" rho_max= "<<setw(3)<<rho_max<<endl;
@@ -148,10 +158,11 @@ int main(int argc, char *argv[])
 
         for (int omega_index=0; omega_index<4; omega_index++) /* going through the different omega_r values */
         {
-            /* Setting the potential in the interacting case */
+            /* Setting the potential in both cases case */
             for (int j=0; j<n; j++)
             {
-                V[j] = pow((rho[j]*omega_r[omega_index]), 2) - 1.0/rho[j];
+                /* If coulomb interaction, interaction = 1, if not = 0 */
+                V[j] = pow((rho[j]*omega_r[omega_index]), 2) - interaction*1.0/rho[j];
             }
 
             /* Filling matrix A with values */
