@@ -24,6 +24,7 @@
 \usepackage{cite}
 \usepackage{braket}
 \usepackage{url}
+
 \bibliographystyle{plain}
 
 \usepackage{algorithmicx}
@@ -109,6 +110,21 @@
 \newcommand\smat[1]{\big(\begin{smallmatrix}#1\end{smallmatrix}\big)}
 \newcommand\ppmat[1]{\begin{pmatrix}#1\end{pmatrix}}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Eirik's self made macros
+\newcommand{\s}{^{*}}
+\newcommand{\V}[1]{\mathbf{#1}}
+\newcommand{\husk}[1]{\color{red} #1 \color{black}}
+\newcommand{\E}[1]{\cdot 10^{#1}}
+\newcommand{\e}[1]{\ \text{#1}}
+\newcommand{\tom}[1]{\big( #1 \big)}
+\newcommand{\Tom}[1]{\Big( #1 \Big)}
+\newcommand{\tomH}[1]{\big[ #1 \big] }
+\newcommand{\TomH}[1]{\Big[ #1 \Big]}
+\newcommand{\tomK}[1]{ \{ #1 \} }
+\newcommand{\TomK}[1]{\Big\lbrace #1 \Big\rbrace}
+\newcommand{\bigabs}[1]{\left| #1 \right|}
+
 % Section labeling
 \usepackage{titlesec}% http://ctan.org/pkg/titlesec
 \renewcommand{\thesubsection}{\arabic{subsection}}
@@ -126,7 +142,9 @@
 Wow dude, so this is like, so abstract dude. Have you ever had a dream that you, um, you had, your, you- you could, you’ll do, you- you wants, you, you could do so, you- you’ll do, you could- you, you want, you want them to do you so much you could do anything?
 \end{abstract}
 \subsection{Introduction}
-In project 2, we aim to solve Schrödinger's equation for two electrons with and without a repulsive Coulomb interaction in a three-dimensional harmonic oscillator well. We start by reformulating the equation in a discretized form as an eigenvalue equation, which can be solved with Jacobi's method. \\\\We can then compare our implementation Jacobi's method fares against ``smarter'' algorithms for solving eigenvalue equations. Finally, we will look at implementing unit-tests, in order to test that the various parts of our program does what it's intended to do.\\\\
+In project 2, we aim to solve Schrödinger's equation for two electrons with and without a repulsive Coulomb interaction in a three-dimensional harmonic oscillator well. We start by reformulating the equation in a discretized form as an eigenvalue equation, which can be solved with Jacobi's method. \\\\
+
+We can then compare our implementation Jacobi's method fares against ``smarter'' algorithms for solving eigenvalue equations. Finally, we will look at implementing unit-tests, in order to test that the various parts of our program does what it's intended to do.\\\\
 \red{Should maybe be rewritten, or changed order, or add more, dunno}
 \subsection{Theory}
 \subsubsection{Schrödinger's equation}
@@ -143,7 +161,7 @@ Starting our journey to write equation \eqref{eq:dimless_schroedinger} as an eig
 \begin{align*}
   u'' = \frac{u(\rho+h)-2u(\rho)+u(\rho-h)}{h^2}+\mathcal{O}(h^2)
 \end{align*}
-where $h$ is our step length. We define minimum and maximum values for $\rho$, $\rho_{\text{min}} = 0$ and $\rho_{\text{max}}$, as we cannot set $\rho_{\text{max}} = \infty$. When setting $\rho_{\text{max}}$, we need to make sure that it is set high enough so that the square of the wavefunction $u$ is small near $\rho_{\text{max}}$ for accuracy of the solution. Next, we split this interval into $N$ number of mesh points, so that we can define the step length as
+where $h$ is our step length. We define minimum and maximum values for $\rho$, $\rho_{\text{min}} = 0$ and $\rho_{\text{max}}$, as we cannot set $\rho_{\text{max}} = \infty$. Next, we split this interval into $N$ number of mesh points, so that we can define the step length as
 \begin{align*}
   h = \frac{\rho_N-\rho_0}{N}
 \end{align*}
@@ -157,68 +175,96 @@ Now we can rewrite the second derivative as
 \end{align*}
 Using this, we can rewrite the dimensionless Schrödinger equation \eqref{eq:dimless_schroedinger} as a discretized equation.
 \begin{align*}
-  -\frac{u_{i+1}-2u_i+u_{i-1}}{h^2} + \rho_i^2u_i = -\frac{u_{i+1}-2u_i+u_{i-1}}{h^2} + V_iu_i = \lambda u_i \numberthis\label{eq:discretized_schroedinger}
+  -\frac{u_{i+1}-2u_i+u_{i-1}}{h^2} + \rho_i^2u_i = -\frac{u_{i+1}-2u_i+u_{i-1}}{h^2} + V_iu_i = \lambda u_i 
 \end{align*}
-where $V_i = \rho_i^2$ is the harmonic oscillator potential. From the previous project, we recall that we can represent equation \eqref{eq:discretized_schroedinger} in terms of a tridiagonal matrix, where the diagonal elements are given by
-\begin{align*}
-  d_i = \frac{2}{h^2} + V_i = \frac{2}{h^2} + \rho_i^2
-\end{align*}
-and the non-diagonal matrix elements
-\begin{align*}
-  e_i = -\frac{1}{h^2}
-\end{align*}
-We notice that in this case, the non-diagonal matrix elements are constant. Using this, we can now write the Schrödinger equation as
-\begin{align*}
-  d_iu_i + e_{i-1}u_{i-1} + e_{i+1}u_{i+1} = \lambda u_i
-\end{align*}
-So that we now have the following eigenvalue equation
-\begin{align*}
-\ppmat{\frac{2}{h^2}+V_1&-\frac{1}{h^2}&0&\dots&0\\
-    -\frac{1}{h^2}&\frac{2}{h^2}+V_2&-\frac{1}{h^2}&0&\dots\\
-    \dots&\dots&\dots&\dots&0\\
-    \dots&\dots&-\frac{1}{h^2}&\frac{2}{h^2}+V_{N-2}&-\frac{1}{h^2}\\
-    0&\dots&0&-\frac{1}{h^2}&\frac{2}{h^2}+V_{N-1}}
-  \ppmat{u_1\\u_2\\\dots\\u_{N-2}\\u_{N-1}} = \lambda
-  \ppmat{u_1\\u_2\\\dots\\u_{N-2}\\u_{N-1}} \numberthis\label{eq:eigval_eq}
-\end{align*}
-which is what we want to solve by using Jacobi's method.
+where $V_i = \rho_i^2$ is the harmonic oscillator potential. We can represent the left-hand side as a matrix multiplied by a vector $u$
 \subsubsection*{Interacting case}
-The eigenvalue equation \eqref{eq:eigval_eq} was derived by assuming one electron in a harmonic oscillator potential. For two electrons with no repulsive Coulomb interaction, we have the following Schrödinger equation
 \begin{align*}
-  \bigg(-\frac{\hbar^2}{2m}\frac{d^2}{dr_1^2} - \frac{\hbar^2}{2m}\frac{d^2}{dr_2^2} + \frac{1}{2}kr_1^2 + \frac{1}{2}kr_2^2\bigg)u(r_1,r_2) = E^{(2)}u(r_1,r_2)
+  V(\rho) = \omega_r^2\rho^2 + 1/\rho
 \end{align*}
-With no interaction, this can be written out as the product of two single-electron wave functions, like we did earlier. Introducing relative coordinates $\mathbf{r} = \mathbf{r_1} - \mathbf{r_2}$ and center-of-mass coordinate $\mathbf{R} = 1/2(\mathbf{r_1}+\mathbf{r_2})$, and adding the repulsive Coulomb interaction between the two electrons to our potential
-\begin{align*}
-  V(r_1,r_2) = \frac{\beta e^2}{|\mathbf{r_1}-\mathbf{r_2}|} = \frac{\beta e^2}{r}
-\end{align*}
-So that we get the following radial Schrödinger equation (omitting the center-of-mass motion)
-\begin{align*}
-  \bigg(-\frac{\hbar^2}{m}\frac{d^2}{dr^2} + \frac{1}{4}kr^2 + \frac{\beta e^2}{r}\bigg)\psi(r) = E_r\psi(r)\\
-\end{align*}
-This is quite similar to the equation \eqref{eq:radial_schroedinger} we found earlier, and we can likewise introduce a dimensionless variable $\rho = r/\alpha$, and rewrite Schrödinger's equation as
-\begin{align*}
-  -\frac{d^2}{d\rho^2}\psi(\rho) + \omega_r^2\rho^2\psi(\rho) + \frac{1}{\rho}\psi(\rho) = \lambda\psi(\rho)
-\end{align*}
-So we see that the only thing we have to modify when adding the repulsive coloumb interaction is to change the potential from $\rho^2$ to $\omega_r\rho^2 + 1/\rho$, where we treat $\omega_r$ as a parameter reflecting the strength of the harmonic oscillator potential. We will later look at how the wave function behaves for different values of $\omega_r$.
 \subsubsection{Jacobi's method}
-\subsection{Experimental}
-The programs used in this project can be found in the GitHub repository \cite{Github}, in the \texttt{/src/} folder. When running the program, it takes 3 command line arguments, $N$, $\rho_{\text{max}}$ and \texttt{mode}. The program has three different runmodes, which we will discuss in some more detail. The text-files saved by the program lies in the \texttt{/benchmarks/} folder, while plots are in \texttt{/figures/}.
-\subsubsection{Non-interacting case}
-Setting \texttt{mode} to \texttt{non-interact} runs the program with specified dimension and $\rho_{\text{max}}$, and stores the 5 lowest eigenvalues (calculated both by Jacobi's method and Armadillo's \texttt{eig\_sym()} function) in a file \texttt{eigenvalues\_noint\_n<N>.dat}. The execution time for both methods are appended to the file \texttt{timing.txt}.
-\subsubsection{Interacting case}
-Setting \texttt{mode} to \texttt{interact} runs the program for 4 different values of $\omega_r$ (0.01, 0.5, 1.0, 5.0) with the Coulomb interaction added.\\The eigenvector for the ground state is written to the file \texttt{eigenvectors\_int\_n<N>.dat}
-\subsubsection{Unit tests}
-Setting \texttt{mode} to \texttt{unit\_tests} runs three unit tests on the different modules in our program, and the result from the tests is written to the file \texttt{unittest.txt}.
-\\\\\red{add the different unit tests, and what they do}
+The aim of Jacobi's method is to use similarity transformation to make a $n \times n$ matrix into a diagonal $n \times n$ matrix with it's eigenvalues as the diagonal. We do this by starting with a matrix $\V{A}$ which is diagonally dominant \husk{REF TO WIKI!}. Within this matrix we find the largest element that is not on the diagonal, calling its indexes $k$ and $l$. The algorithm is as follows:
+\begin{algorithm}[H]
+\small
+\caption{Maximum non-diagonal element}\label{alg:max_offdiag}
+\begin{algorithmic}[1]
+\State $max = 0.0$
+\For{$i=0,\,n$}
+\For{$j= i+1, \, n$}
+\If{$|A[i][j]| > max$}
+\State{$|A[i][j]| = max$}
+\State{k = i}
+\State{l = j}
+\EndIf
+\EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+Now we want to rotate matrix $\V{A}$ such that the larges off-diagonal element becomes zero. This is done by using equation:
+\begin{equation}
+\V{B} = \V{S}^{\V{T}} \V{A} \V{S}
+\label{eq:symtrans}
+\end{equation}
+Where $\V{S}$ is given as:
+\begin{align*}
+\ppmat{1 & 0 & \cdots & 0 & 0 & \cdots & 0 & 0 \\
+	   0 & 1 & \cdots & 0 & 0 & \cdots & 0 & 0 \\
+	   \vdots & \vdots & \ddots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+	   0 & 0 & \cdots & \cos \theta & 0 & \cdots & 0 & \sin \theta \\
+	   0 & 0 & \cdots & 0 & 1 & \cdots & 0 & 0 \\
+	   \vdots & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+	   0 & 0 & \cdots & 0 & 0 & \cdots & 1 & 0 \\
+	   0 & 0 & \cdots & -\sin \theta & 0 & \cdots & 0 & \cos \theta \\}
+\end{align*}
+With properties $\V{S}^{\V{T}} = \V{S}^{-1}$.
+The positioning of $\cos \theta$ and $\sin \theta$ within the matrix is defined by the index of the largest off-digaonal element like this:
+\begin{align*}
+s_{kk} = s_{ll} = \cos\theta , \quad s_{kl} = -s_{lk} = \sin \theta, \quad s_{ii} = -s_{_ii} = 1 \quad i \neq k, \, i \neq l
+\end{align*}
+This is the same as performing a plane rotation around an angle $\theta$ in the Euclidean $n$-dimensional space. \\
+For $\V{B}$ this gives us:
+\begin{align*}
+				b_{ii} 	&= a_{ii}, \ i \neq k, \ i \neq l \\
+				b_{ik} 	&= a_{ik}\cos \theta - a_{il}\sin\theta,\ i \neq k, \ i \neq l \\
+				b_{il} 	&= a_{il} \cos\theta + a_{ik}\sin\theta, \ i \neq k, \ i \neq l \\
+				b_{kk} 	&= a_{kk}\cos^2\theta - 2a_{kl}\cos\theta \sin\theta + a_{ll}\sin^2\theta \\
+				b_{ll} 	&= a_{ll}\cos^2\theta +2a_{kl}\cos\theta\sin\theta + a_{kk}\sin^2\theta \\
+				b_{kl} 	&= (a_{kk} - a_{ll})\cos\theta \sin\theta +a_{kl}(\cos^2\theta - \sin^2\theta)
+\end{align*}
+Where $\theta$ is set as the angle that makes $b_{kl} = 0$. Each transformation can be proven to bring the matrix closer to the diagonal form. \husk{referer til forelesningsnotater}.  \\ \\
+When all this is done, the old maxmium off-diagonal value will have become zero and a new one will have risen, but it will not be as large as the old one. We repeat our whole process until the maxmium value of all off-diagonal elements are below a certain threshold value. Ideally we would want them all to be zero, but very, very small values is good enough. \\
+By looking at our expression for $b_kl = 0$ and defining
+\begin{align*}
+t = \tan\theta &= \frac{\sin\theta}{\cos\theta} \\
+\tau = \cot 2\theta &= \frac{a_{ll} - a_{kk}}{2a_{kl}}
+\intertext{We get:}
+(a_{kk} - a_{ll})\cos\theta \sin\theta +a_{kl}(\cos^2\theta - \sin^2\theta) &= 0 \\
+(a_{kk} - a_{ll})\cos^2\theta t + a_{kl}\cos^2\theta - a_{kl}\sin^2\theta &= 0 \\
+(a_{kk} - a_{ll}) t + a_{kl} - a_{kl}\frac{\sin^2\theta}{\cos^2\theta} &= 0 \\
+(a_{kk} - a_{ll}) t + a_{kl}(1-t^2) &= 0 \\
+\frac{a_{kk} - a_{ll}}{a_{kl}} t &= t^2 -1 \\
+-\tau t &= \frac{t^2-1}{2} \\
+t^2 + 2 \tau t - 1 = 0, \quad &\Rightarrow \quad t = -\tau \pm \sqrt{1 + \tau^2}
+\intertext{Cosine and sinus are easily found to be}
+\cos \theta = \frac{1}{\sqrt{1 + t^2}}, \quad& \sin\theta = \cos\theta \cdot t
+\end{align*} 
+As we can see we can choose two different values for $t$. The one we want is the one that is the smallest. This is evident if we look at $b_{ik}$ and $b_{il}$. Hopefully these values will quickly reach values near zero and  we want to keep them there. To do this we want $\cos \theta$ to go to 1 and $\sin \theta$ to go to 0 simultaniously. By always choosing the lowest $t$-value we choose the lowest possible angle and therefore we will minimize the changes to the non-diagonal elements in the matrix. Except for $b_{kl}$ which is always set to zero. \\ \\
+
+To fully grasp the idea of this method we have imagined it as this: \\
+Let us pretend that you have ten bars in front of you. These bars can be pushed down, but as you push down one, the others will be affected also. We want to push all the bars as far down as possible, and if you push down the highest bar, the others can't reach it's height, but they are free to go up and down. Then all you have to do is push down one bar (find the maximum non-diagonal element and rotate the matrix) see how the other bars react (view the matrix after rotation), locate the bar that is now the highest and push that one down. As you do this, gradually all the bars will come under a certain height, even though they may not be completely pushed down. When you are satisfied with the shortness of the tallest bar, your job is done and we have found our diagonal matrix with eigenvalues. \\ \\
+\husk{Jacobi's algorithm here?}
+\subsection{Experimental?}
 \subsection{Results}
+\husk{We need to make graphs of $|\Psi(\rho)|^2$ for $\lambda_1$ etc.}
+\subsubsection{Unit test}
+From the three implemented unit tests all three passed.
+\subsection{Discussion}
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{../figures/eigvec_interact_n100.png}
   \caption{Plot of the eigenvectors for the interacting case for $n=100$}
   \label{fig:eigvec100}
 \end{figure}
-\subsection{Discussion}
-
 \subsection{Conclusion}
 \bibliography{references}
 \end{document}
