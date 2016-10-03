@@ -109,6 +109,21 @@
 \newcommand\smat[1]{\big(\begin{smallmatrix}#1\end{smallmatrix}\big)}
 \newcommand\ppmat[1]{\begin{pmatrix}#1\end{pmatrix}}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Eirik's self made macros
+\newcommand{\s}{^{*}}
+\newcommand{\V}[1]{\mathbf{#1}}
+\newcommand{\husk}[1]{\color{red} #1 \color{black}}
+\newcommand{\E}[1]{\cdot 10^{#1}}
+\newcommand{\e}[1]{\ \text{#1}}
+\newcommand{\tom}[1]{\big( #1 \big)}
+\newcommand{\Tom}[1]{\Big( #1 \Big)}
+\newcommand{\tomH}[1]{\big[ #1 \big] }
+\newcommand{\TomH}[1]{\Big[ #1 \Big]}
+\newcommand{\tomK}[1]{ \{ #1 \} }
+\newcommand{\TomK}[1]{\Big\lbrace #1 \Big\rbrace}
+\newcommand{\bigabs}[1]{\left| #1 \right|}
+
 % Section labeling
 \usepackage{titlesec}% http://ctan.org/pkg/titlesec
 \renewcommand{\thesubsection}{\arabic{subsection}}
@@ -128,6 +143,8 @@ Wow dude, so this is like, so abstract dude. Have you ever had a dream that you,
 \subsection{Introduction}
 In project 2, we aim to solve Schrödinger's equation for two electrons with and without a repulsive Coulomb interaction in a three-dimensional harmonic oscillator well. We start by reformulating the equation in a discretized form as an eigenvalue equation, which can be solved with Jacobi's method. \\\\We can then compare our implementation Jacobi's method fares against ``smarter'' algorithms for solving eigenvalue equations. Finally, we will look at implementing unit-tests, in order to test that the various parts of our program does what it's intended to do.\\\\
 \red{Should maybe be rewritten, or changed order, or add more, dunno}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Theory}
 \subsubsection{Schrödinger's equation}
 In this project, we will assume that the electrons move in a three-dimensional harmonic oscillator potential, and repel each other via the static Coulomb interaction. By assuming spherical symmetry, the solution for the radial part of Schrödinger's equation for one electron reads
@@ -182,6 +199,8 @@ So that we now have the following eigenvalue equation
   \ppmat{u_1\\u_2\\\dots\\u_{N-2}\\u_{N-1}} \numberthis\label{eq:eigval_eq}
 \end{align*}
 which is what we want to solve by using Jacobi's method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection*{Interacting case}
 The eigenvalue equation \eqref{eq:eigval_eq} was derived by assuming one electron in a harmonic oscillator potential. For two electrons with no repulsive Coulomb interaction, we have the following Schrödinger equation
 \begin{align*}
@@ -200,7 +219,80 @@ This is quite similar to the equation \eqref{eq:radial_schroedinger} we found ea
   -\frac{d^2}{d\rho^2}\psi(\rho) + \omega_r^2\rho^2\psi(\rho) + \frac{1}{\rho}\psi(\rho) = \lambda\psi(\rho)
 \end{align*}
 So we see that the only thing we have to modify when adding the repulsive coloumb interaction is to change the potential from $\rho^2$ to $\omega_r\rho^2 + 1/\rho$, where we treat $\omega_r$ as a parameter reflecting the strength of the harmonic oscillator potential. We will later look at how the wave function behaves for different values of $\omega_r$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Jacobi's method}
+The aim of Jacobi's method is to use similarity transformation to make a $n \times n$ matrix into a diagonal $n \times n$ matrix with it's eigenvalues as the diagonal. We do this by starting with a matrix $\V{A}$ which is diagonally dominant \husk{REF TO WIKI!}. Within this matrix we find the largest element that is not on the diagonal, calling its indexes $k$ and $l$. The algorithm is as follows:
+\begin{algorithm}[H]
+\small
+\caption{Maximum non-diagonal element}\label{alg:max_offdiag}
+\begin{algorithmic}[1]
+\State $max = 0.0$
+\For{$i=0,\,n$}
+\For{$j= i+1, \, n$}
+\If{$|A[i][j]| > max$}
+\State{$|A[i][j]| = max$}
+\State{k = i}
+\State{l = j}
+\EndIf
+\EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+Now we want to rotate matrix $\V{A}$ such that the larges off-diagonal element becomes zero. This is done by using equation:
+\begin{equation}
+\V{B} = \V{S}^{\V{T}} \V{A} \V{S}
+\label{eq:symtrans}
+\end{equation}
+Where $\V{S}$ is given as:
+\begin{align*}
+\ppmat{1 & 0 & \cdots & 0 & 0 & \cdots & 0 & 0 \\
+	   0 & 1 & \cdots & 0 & 0 & \cdots & 0 & 0 \\
+	   \vdots & \vdots & \ddots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+	   0 & 0 & \cdots & \cos \theta & 0 & \cdots & 0 & \sin \theta \\
+	   0 & 0 & \cdots & 0 & 1 & \cdots & 0 & 0 \\
+	   \vdots & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+	   0 & 0 & \cdots & 0 & 0 & \cdots & 1 & 0 \\
+	   0 & 0 & \cdots & -\sin \theta & 0 & \cdots & 0 & \cos \theta \\}
+\end{align*}
+With properties $\V{S}^{\V{T}} = \V{S}^{-1}$.
+The positioning of $\cos \theta$ and $\sin \theta$ within the matrix is defined by the index of the largest off-digaonal element like this:
+\begin{align*}
+s_{kk} = s_{ll} = \cos\theta , \quad s_{kl} = -s_{lk} = \sin \theta, \quad s_{ii} = -s_{_ii} = 1 \quad i \neq k, \, i \neq l
+\end{align*}
+This is the same as performing a plane rotation around an angle $\theta$ in the Euclidean $n$-dimensional space. \\
+For $\V{B}$ this gives us:
+\begin{align*}
+				b_{ii} 	&= a_{ii}, \ i \neq k, \ i \neq l \\
+				b_{ik} 	&= a_{ik}\cos \theta - a_{il}\sin\theta,\ i \neq k, \ i \neq l \\
+				b_{il} 	&= a_{il} \cos\theta + a_{ik}\sin\theta, \ i \neq k, \ i \neq l \\
+				b_{kk} 	&= a_{kk}\cos^2\theta - 2a_{kl}\cos\theta \sin\theta + a_{ll}\sin^2\theta \\
+				b_{ll} 	&= a_{ll}\cos^2\theta +2a_{kl}\cos\theta\sin\theta + a_{kk}\sin^2\theta \\
+				b_{kl} 	&= (a_{kk} - a_{ll})\cos\theta \sin\theta +a_{kl}(\cos^2\theta - \sin^2\theta)
+\end{align*}
+Where $\theta$ is set as the angle that makes $b_{kl} = 0$. Each transformation can be proven to bring the matrix closer to the diagonal form. \husk{referer til forelesningsnotater}.  \\ \\
+When all this is done, the old maxmium off-diagonal value will have become zero and a new one will have risen, but it will not be as large as the old one. We repeat our whole process until the maxmium value of all off-diagonal elements are below a certain threshold value. Ideally we would want them all to be zero, but very, very small values is good enough. \\
+By looking at our expression for $b_kl = 0$ and defining
+\begin{align*}
+t = \tan\theta &= \frac{\sin\theta}{\cos\theta} \\
+\tau = \cot 2\theta &= \frac{a_{ll} - a_{kk}}{2a_{kl}}
+\intertext{We get:}
+(a_{kk} - a_{ll})\cos\theta \sin\theta +a_{kl}(\cos^2\theta - \sin^2\theta) &= 0 \\
+(a_{kk} - a_{ll})\cos^2\theta t + a_{kl}\cos^2\theta - a_{kl}\sin^2\theta &= 0 \\
+(a_{kk} - a_{ll}) t + a_{kl} - a_{kl}\frac{\sin^2\theta}{\cos^2\theta} &= 0 \\
+(a_{kk} - a_{ll}) t + a_{kl}(1-t^2) &= 0 \\
+\frac{a_{kk} - a_{ll}}{a_{kl}} t &= t^2 -1 \\
+-\tau t &= \frac{t^2-1}{2} \\
+t^2 + 2 \tau t - 1 = 0, \quad &\Rightarrow \quad t = -\tau \pm \sqrt{1 + \tau^2}
+\intertext{Cosine and sinus are easily found to be}
+\cos \theta = \frac{1}{\sqrt{1 + t^2}}, \quad& \sin\theta = \cos\theta \cdot t
+\end{align*} 
+As we can see we can choose two different values for $t$. The one we want is the one that is the smallest. This is evident if we look at $b_{ik}$ and $b_{il}$. Hopefully these values will quickly reach values near zero and  we want to keep them there. To do this we want $\cos \theta$ to go to 1 and $\sin \theta$ to go to 0 simultaniously. By always choosing the lowest $t$-value we choose the lowest possible angle and therefore we will minimize the changes to the non-diagonal elements in the matrix. Except for $b_{kl}$ which is always set to zero. \\ \\
+
+To fully grasp the idea of this method we have imagined it as this: \\
+Let us pretend that you have ten bars in front of you. These bars can be pushed down, but as you push down one, the others will be affected also. We want to push all the bars as far down as possible, and if you push down the highest bar, the others can't reach it's height, but they are free to go up and down. Then all you have to do is push down one bar (find the maximum non-diagonal element and rotate the matrix) see how the other bars react (view the matrix after rotation), locate the bar that is now the highest and push that one down. As you do this, gradually all the bars will come under a certain height, even though they may not be completely pushed down. When you are satisfied with the shortness of the tallest bar, your job is done and we have found our diagonal matrix with eigenvalues.
+%\husk{Jacobi's algorithm here?}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Experimental}
 The programs used in this project can be found in the GitHub repository \cite{Github}, in the \texttt{/src/} folder. When running the program, it takes 3 command line arguments, $N$, $\rho_{\text{max}}$ and \texttt{mode}. The program has three different runmodes, which we will discuss in some more detail. The text-files saved by the program lies in the \texttt{/benchmarks/} folder, while plots are in \texttt{/figures/}.
 \subsubsection{Non-interacting case}
@@ -213,7 +305,7 @@ Setting \texttt{mode} to \texttt{unit\_tests} runs three unit tests on the diffe
 \subsection{Results}
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{../figures/eigvec_interact_n100.png}
+  \includegraphics[scale=0.5]{../figures/eigvec_two-int_n100.png}
   \caption{Plot of the eigenvectors for the interacting case for $n=100$}
   \label{fig:eigvec100}
 \end{figure}
