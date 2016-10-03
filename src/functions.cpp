@@ -94,6 +94,7 @@ void rotate(double ** A, double ** R, int k, int l, int n){
     }
 
     double a_kk, a_ll, a_il, a_ik, r_ik, r_il;
+    //old A values
     a_kk = A[k][k];
     a_ll = A[l][l];
 
