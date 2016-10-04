@@ -136,13 +136,18 @@
 
 \begin{document}
 \maketitle
-
 \begin{abstract}
-Wow dude, so this is like, so abstract dude. Have you ever had a dream that you, um, you had, your, you- you could, you’ll do, you- you wants, you, you could do so, you- you’ll do, you could- you, you want, you want them to do you so much you could do anything?
+The aim of this project is to solve Schrödinger's equation for two electrons with and without a repulsive Coulomb interaction in a three-dimensional harmonic oscillator well. We start by reformulating the equation in a discretized form as an eigenvalue equation, which can be solved with Jacobi's method. The program will include unit tests and time measurement comparing Jacobi's method to another method. We found that Jacobi's method became more accurate if we started out with a bigger matrix, but it also became very slow with increasing n. The probability of finding the electrons over a bigger $\rho$ interval decreases as $\omega_r$ increases, but if we add the Coulomb interaction the interval will be larger than for its non-Coulomb counterpart.
 \end{abstract}
 \subsection{Introduction}
-In project 2, we aim to solve Schrödinger's equation for two electrons with and without a repulsive Coulomb interaction in a three-dimensional harmonic oscillator well. We start by reformulating the equation in a discretized form as an eigenvalue equation, which can be solved with Jacobi's method. \\\\We can then compare our implementation Jacobi's method fares against ``smarter'' algorithms for solving eigenvalue equations. Finally, we will look at implementing unit-tests, in order to test that the various parts of our program does what it's intended to do.\\\\
-\red{Should maybe be rewritten, or changed order, or add more, dunno}
+By studying first one then two electrons in a harmonic oscillator well and by solving the Schrödinger's equation by reformulating it in a discretized form as an eigenvalue equation and solving that equation with Jacobi's method. \\
+Once the Schrödinger's equation is on a form we can solve with Jacobi's method, we will solve it for $n$x$n$ matrices of different size for one electron and compare our results. Then we will see if the number of rotations needed to complete Jacobi's method can be apporximated by a polynomal and compare the time usage of our "home made" Jacobi's method with the time usage of Armadillos solver for eigenvalues. \\ \\
+Afterwards we will increase the number of electrons to two. This will change our potential and make it dependent on $\omega_rtime usage$ which reflects the strenght of the oscillator potentail. The Coulomb interaction will also be implemented in this part of the program so that we can compare the probability $|\Psi(\rho)|^2$ for different $\omega_r$ with and without Coulomb interaction. \\ \\
+The program will also include three unit tests checking if we get the right eigenvalues, find the largest non-diagonal element and if orthogonality is preserved during Jacobi's method. 
+
+
+%In project 2, we aim to solve Schrödinger's equation for two electrons with and %without a repulsive Coulomb interaction in a three-dimensional harmonic oscillator %well. We start by reformulating the equation in a discretized form as an eigenvalue %equation, which can be solved with Jacobi's method. \\\\We can then compare our %implementation Jacobi's method fares against ``smarter'' algorithms for solving %eigenvalue equations. Finally, we will look at implementing unit-tests, in order to %test that the various parts of our program does what it's intended to do.\\\\
+%\red{Should maybe be rewritten, or changed order, or add more, dunno}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Theory}
@@ -220,8 +225,9 @@ This is quite similar to the equation \eqref{eq:radial_schroedinger} we found ea
 \end{align*}
 So we see that the only thing we have to modify when adding the repulsive coloumb interaction is to change the potential from $\rho^2$ to $\omega_r\rho^2 + 1/\rho$, where we treat $\omega_r$ as a parameter reflecting the strength of the harmonic oscillator potential. We will later look at how the wave function behaves for different values of $\omega_r$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsubsection{Jacobi's method}
-The aim of Jacobi's method is to use similarity transformation to make a $n \times n$ matrix into a diagonal $n \times n$ matrix with it's eigenvalues as the diagonal. We do this by starting with a matrix $\V{A}$ which is diagonally dominant \husk{REF TO WIKI!}. Within this matrix we find the largest element that is not on the diagonal, calling its indexes $k$ and $l$. The algorithm is as follows:
+The aim of Jacobi's method is to use similarity transformation to make a $n \times n$ matrix into a diagonal $n \times n$ matrix with it's eigenvalues as the diagonal. We do this by starting with a matrix $\V{A}$ which is diagonally dominant \cite{DDMatrix}. Within this matrix we find the largest element that is not on the diagonal, calling its indexes $k$ and $l$. The algorithm is as follows:
 \begin{algorithm}[H]
 \small
 \caption{Maximum non-diagonal element}\label{alg:max_offdiag}
@@ -269,7 +275,7 @@ For $\V{B}$ this gives us:
 				b_{ll} 	&= a_{ll}\cos^2\theta +2a_{kl}\cos\theta\sin\theta + a_{kk}\sin^2\theta \\
 				b_{kl} 	&= (a_{kk} - a_{ll})\cos\theta \sin\theta +a_{kl}(\cos^2\theta - \sin^2\theta)
 \end{align*}
-Where $\theta$ is set as the angle that makes $b_{kl} = 0$. Each transformation can be proven to bring the matrix closer to the diagonal form. \husk{referer til forelesningsnotater}.  \\ \\
+Where $\theta$ is set as the angle that makes $b_{kl} = 0$. Each transformation can be proven to bring the matrix closer to the diagonal form. \cite{lecturenotes}  \\ \\
 When all this is done, the old maxmium off-diagonal value will have become zero and a new one will have risen, but it will not be as large as the old one. We repeat our whole process until the maxmium value of all off-diagonal elements are below a certain threshold value. Ideally we would want them all to be zero, but very, very small values is good enough. \\
 By looking at our expression for $b_kl = 0$ and defining
 \begin{align*}
@@ -292,25 +298,113 @@ To fully grasp the idea of this method we have imagined it as this: \\
 Let us pretend that you have ten bars in front of you. These bars can be pushed down, but as you push down one, the others will be affected also. We want to push all the bars as far down as possible, and if you push down the highest bar, the others can't reach it's height, but they are free to go up and down. Then all you have to do is push down one bar (find the maximum non-diagonal element and rotate the matrix) see how the other bars react (view the matrix after rotation), locate the bar that is now the highest and push that one down. As you do this, gradually all the bars will come under a certain height, even though they may not be completely pushed down. When you are satisfied with the shortness of the tallest bar, your job is done and we have found our diagonal matrix with eigenvalues.
 %\husk{Jacobi's algorithm here?}
 
+\subsubsection{Unit tests}
+We implemented three unit test. The first checks if Jacobis method returns the right eigenvalues for a known matrix with known eigenvalues. The second test checks if our function for finding the largest non-diagonal element for a known symmetric matrix And the last one checks if the eigenvectors of our rotated matrix are still orthogonal. For the last check we use the fact that for a vector $\V{v}$ that has orthogonal properties:
+\begin{align*}
+\V{v}_j^{T} \V{v}_i &= \delta_{ij}
+\intertext{The vector $\V{w_i} = \V{U}\V{v}_i$ will also be orthogonal after a unitary or orthogonal transformation. This can be showed by the following:}
+\V{w}_j^{T} \V{w}_i = \V{v}_j^T \V{U}^T \V{U} \V{v}_i &= \V{v}_j^{T} \V{v}_i = \delta_{ij}
+ \end{align*}
+This was used by implementing this method as a part of each step in Jacobi's method when called upon.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Experimental}
-The programs used in this project can be found in the GitHub repository \cite{Github}, in the \texttt{/src/} folder. When running the program, it takes 3 command line arguments, $N$, $\rho_{\text{max}}$ and \texttt{mode}. The program has three different runmodes, which we will discuss in some more detail. The text-files saved by the program lies in the \texttt{/benchmarks/} folder, while plots are in \texttt{/figures/}.
-\subsubsection{Non-interacting case}
-Setting \texttt{mode} to \texttt{non-interact} runs the program with specified dimension and $\rho_{\text{max}}$, and stores the 5 lowest eigenvalues (calculated both by Jacobi's method and Armadillo's \texttt{eig\_sym()} function) in a file \texttt{eigenvalues\_noint\_n<N>.dat}. The execution time for both methods are appended to the file \texttt{timing.txt}.
-\subsubsection{Interacting case}
-Setting \texttt{mode} to \texttt{interact} runs the program for 4 different values of $\omega_r$ (0.01, 0.5, 1.0, 5.0) with the Coulomb interaction added.\\The eigenvector for the ground state is written to the file \texttt{eigenvectors\_int\_n<N>.dat}
+The programs used in this project can be found in the GitHub repository \cite{Github}, in the \texttt{/src/} folder. When running the program, it takes 3 command line arguments, $N$, $\rho_{\text{max}}$ and \texttt{mode}. The program has four different runmodes, which we will discuss in some more detail.
+\subsubsection{One electron, non-interacting case}
+Setting \texttt{mode} to \texttt{one} runs the program for one electron and no Coulomb interacted, with specified dimension $N$ and maximum value $\rho_{\text{max}}$, and stores the 5 lowest eigenvalues (calculated both by Jacobi's method and Armadillo's \texttt{eig\_sym()} function) in a file \texttt{eigenvalues\_noint\_n<N>.dat}. The execution time for both methods are appended to the file \texttt{timing.txt}.
+\subsubsection{Two electrons, interacting case}
+Setting \texttt{mode} to \texttt{two-int} runs the program for 4 different values of $\omega_r =$ (0.01, 0.5, 1.0, 5.0) with the Coulomb interaction added.\\The eigenvector for the ground state is written to the file \texttt{eigenvectors\_two-int\_n<N>.dat}
+\subsubsection{Two electrons, non-interacting case}
+Setting \texttt{mode} to \texttt{two-noint} runs the program for the same values of $\omega_r$ as the interacting case, with no Coulomb interaction.\\The ground state eigenvector is written to the file \texttt{eigenvectors\_two-noint\_n<N>.dat}.
 \subsubsection{Unit tests}
-Setting \texttt{mode} to \texttt{unit\_tests} runs three unit tests on the different modules in our program, and the result from the tests is written to the file \texttt{unittest.txt}.
-\\\\\red{add the different unit tests, and what they do}
+Setting \texttt{mode} to \texttt{unit-tests} runs three unit tests on the different modules in our program, and the result from the tests are written to the file \texttt{unittest.txt}.
 \subsection{Results}
+The results created by the program are stored in the \texttt{/benchmarks/} folder, while plots generated from these text-files are in \texttt{/figures/}. For Jacobi's method, the number of rotations is printed to terminal.
+
+\subsubsection{One Electron in Harmonic Oscillator}
+From the part of our program that looks at the non-interactive case for one electron we found our lowest three eigenvalues. The result is presented in table \ref{tab:eigenvalues} where we see the eigevalues as a function of matrix size n.
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c|c|c|c|c|c|c} 
+n & 10 & 50 & 100 & 200 & 300 & 400 & 500 \\ \hline
+$\lambda_1$ & 2.6867 & 2.9874  & 2.9968  & 2.9992  & 2.9996 & 2.9998  & 2.9998 \\ \hline
+$\lambda_2$ & 6.1130 & 6.9369  & 6.9843  & 6.9960  & 6.9982 & 6.9990  & 6.9993\\ \hline
+$\lambda_3$ & 11.057 & 10.8452 & 10.9617 & 10.9904 & 10.9957& 10.9976 & 10.9984\\ 
+\end{tabular}
+\caption{The three lowest eigenvalues for the non interactive case for different n-values. $\rho_{max} = 10.$}
+\label{tab:eigenvalues}
+\end{table}
+But n is not the only variant, we can also change $\rho_{max}$. In table \ref{tab:rhoeigenvalues} we see how the eigenvalues change as a function of $\rho_{max}$. Here we have used $n = 101$.
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c|c|c|c}
+$\rho_{max}$ & 1 & 5 & 10 & 15 \\ \hline
+$\lambda_1$ &  9.963  & 2.999  & 2.997  & 2.993 \\ \hline
+$\lambda_2$ &  39.023 & 6.996  & 6.985  & 6.965 \\ \hline
+$\lambda_3$ &  87.365 & 10.990 & 10.962 & 10.915 \\ 
+\end{tabular}
+\caption{The difference in eigenvalues as a function of $\rho_{max}$ at matrix size $n = 101$.}
+\label{tab:rhoeigenvalues}
+\end{table}
+Jaobi's method uses a certain number of iterations to reach the point where all non-diagonal numbers are as good as zero. For our program, number of iterations as a function of n is plotted in \ref{fig:iterations} where we have used the limit $\epsilon = 1.0\cdot 10^{-8}$ as a threshold.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{../figures/iterations.png}
+\caption{Number of iteratons as a function of matrix size n.}
+\label{fig:iterations}
+\end{figure}
+In out program we have used two different methods for finding eigenvalues: Jacobi's method and Armadillo. The difference in time for each method is presented in table \ref{tab:time}
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c|c}
+n & Jacobi [ms] & Armadillo [ms] \\ \hline
+10 &  0.27 & 0.65        \\ \hline
+50 &  24.48 & 1.34       \\ \hline
+100 & 339.93 & 4.79      \\ \hline 
+200 & 4609.32 & 34.13    \\ \hline
+300 & 27044.07 & 108.31  \\ \hline
+400 & 73842.08 & 230.47  \\ \hline
+500 & 190636.43 & 436.97 \\ \hline
+\end{tabular}
+\caption{The time used by each method with matrix size n and $\rho_{max} = 10$.}
+\label{tab:time}
+\end{table}
+
+\subsubsection{Two electrons in a harmonic oscillator}
+\textbf{Without Coulomb interaction}
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{../figures/eigvec_two-int_n100.png}
-  \caption{Plot of the eigenvectors for the interacting case for $n=100$}
-  \label{fig:eigvec100}
+  \includegraphics[scale=0.47]{../figures/eigvec_two-noint_n200.png}
+  \caption{Plot of the ground state eigenvector for different $\omega_r$ values, without Coulomb interaction, and matrix dimension $N=200$. $\rho_{\text{max}} = 10$, but plotted from $\rho = 0$ to $\rho = 4$ for readability.}
+  \label{fig:eigvec_noint_200}
+\end{figure}
+\textbf{With Coulomb interaction}
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.47]{../figures/eigvec_two-int_n200.png}
+  \caption{Plot of the ground state eigenvector for different $\omega_r$ values, with repulsive Coulomb interaction, and matrix dimension $N=200$. $\rho_{\text{max}} = 10$, but plotted from $\rho = 0$ to $\rho = 4$ for readability.}
+  \label{fig:eigvec_int_200}
+\end{figure}
+We look a bit closer at figure \ref{fig:eigvec_noint_200} and \ref{fig:eigvec_int_200}, and plot some of the eigenvectors in the same plot.
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{../figures/eigvec_compare_n200.png}
+  \caption{Plot of the ground state eigenvectors for $\omega_r = 0.01$ and $\omega_r = 0.5$ and no Coulomb interaction. Overplotted in dashed lines is the corresponding eigenvector with a repulsive Coulomb interaction added.}
+  \label{fig:eigvec_compare}
 \end{figure}
 \subsection{Discussion}
+\subsubsection{One Electron in Harmonic Oscillator}
+As we can see from table \ref{tab:eigenvalues} the larger matrix we have, the better eigenvalues we get. Our aim was to get four leading digits after the decimal point. But we can only say this for our lowest eigenvalue. It is clear that for a matrix of size 400x400 the lowest eigenvalue will have four leading digits after the decimal point. The other two are getting nearer four digits, but since we have no repetition of the last digit or the two last digits in respectively the case of $\lambda_2$ and $\lambda_3$ we can not say anything certain. However, the fact that $\lambda_1$ needed n=400 and that $\lambda_2$ seems to be very close at n=500 should gives us a hint of how big a matrix we would need. If it was very important to me to have all four digits in the case of $\lambda_3$ we would take my time and run the program for higher and higher n-values. Since this is not the case, we are satisfied by stopping here.
+It is also apperant from table \ref{tab:rhoeigenvalues} that the eigenvalues are also dependent on $\rho_{max}$ which is logical.\\ \\
+From figure \ref{fig:iterations} we can see that the number of iterations needed can be approximated as a second degree polynomial as a function of the matrix size $n$. This is logical as the "area" of the matrix will increase as a function of $n^2$ giving the program more to work with. This is not a perfect fit as we have too few iteration points to make a good formula, but it works. Again, if a part of a bigger project was dependent on this part of the program being as accurate as possible, I would run the program for higher values of n. \\ \\
+Table \ref{tab:time} clearly shows us that our method is inferior compared to the method Armadillo uses. While we have to wait more than 3 minutes for $n = 500$ with Jacobi, it is done in 0.4 seconds with Armadillo. This is because Jacobi is a very brute force way of finding the eigenvectors. While it works, the problem is that when we have found the largest non-diagonal element of the matrix and set it to zero, we are never sure that it won't become the largest again (even though it will never be as large as it was). This means that we have to look over all the non-diagonal elements for every iteration and that we have to work on the same element multiple times. And that again leads to a slow method, even though it gives the results we want. Therefore it is important to think of the accuracy of the eigenvalues compared to the time usage. With high n you can get good accuracy, but it will also take more time.
 
+\subsubsection{Two electrons in a harmonic oscillator}
+For our case with two electrons in the harmonic oscillator potential without Coulomb interaction, we look at figure \ref{fig:eigvec_noint_200} to see how the wave function (squared) behaves when varying $\omega_r$. We see that when increasing $\omega_r$, the peak becomes increasingly higher, while the width decreases. From quantum physics, we recall that when plotting $|\psi|^2$, this corresponds to the probability distribution. We can therefore infer from the figure that as $\omega_r$ increases, we are more likely to find the particle closer to $\rho = 0$. This makes a lot of sense, since we earlier said that we treat $\omega_r$ as a parameter reflecting the strength of the harmonic oscillator potential, and increasing it causes the potential well to get stronger.\\\\
+Figure \ref{fig:eigvec_int_200} shows the same plot as figure \ref{fig:eigvec_noint_200}, but with a repulsive Coulomb interaction added. It might not be easy to see that much difference between the figures, but if we study them closely, we see that the wave function curves seems to be shifted slightly to the right as compared to without interaction. This would make a lot of sense, as a repulsive interaction between the two electrons should push the electrons apart the closer they are to each other. In doing so, it should counteract (to some degree) the effect of the harmonic oscillator potential.\\\\
+To more clearly see this, we can look at figure \ref{fig:eigvec_compare}, where the eigenvectors for the two lowest $\omega_r$ values, with and without interaction is overplotted. Looking at this, we see clearly that when adding the Coulomb interaction, the wave function gets shifted towards the right. We also see that when increasing $\omega_r$, this shift gets smaller, as the harmonic oscillator potential starts to dominate strength wise.
 \subsection{Conclusion}
+From table \ref{tab:eigenvalues} we can clearly see that the accuracy of the eigenvalues given to us by Jacobi's method is a function of the matrix size n. However, from table \ref{tab:time} we can also see that the time used by the program greatly increases with the increasing of n. Although we have mostly used Jacobi's method here, Armadillos eigenvalue finder seems to be the better choice in the future.\\\\
+In the two electron case, we see from figure \ref{fig:eigvec_compare} that when adding the repulsive Coulomb interaction, the probability distributions get shifted away from the center, where the harmonic oscillator potential is the strongest, but as strength of potential $\omega_r$ increases, this shift gets smaller.
 \bibliography{references}
 \end{document}
