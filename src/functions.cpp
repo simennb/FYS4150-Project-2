@@ -43,7 +43,14 @@ void jacobi(double ** A, double ** R, int n, double epsilon){
         maxoffdiag = max_offdiag(A, &k, &l, n);
         iterations++;
     }
+
     cout << "Number of iterations " << iterations<< endl;
+    ofstream ofile;
+    ofile.open("../benchmarks/iterations_n"+to_string(n)+".dat");
+    ofile<<setiosflags(ios::showpoint | ios::uppercase);
+    ofile<<"Iterations= "<<setw(5)<<iterations;
+    ofile.close();
+
     return;
 }
 
