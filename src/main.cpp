@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
         cout<<"   one : one electron, no coulomb interaction"<<endl;
         cout<<"   two-noint : two electrons, no coulomb interaction"<<endl;
         cout<<"   two-int : two electrons, repulsive coulomb interaction"<<endl;
+        cout<<"   unit-tests : runs unit tests"<<endl;
         exit(1);
     }
 
@@ -205,7 +206,7 @@ int main(int argc, char *argv[])
         ofile.close();
     }
 
-    if (strcmp(argv[3], "unit_tests") == 0)
+    if (strcmp(argv[3], "unit-tests") == 0)
     {
         /* If running unit tests, making sure that no matrices/arrays initialized */
         //unit_testing(); or something when functions made
