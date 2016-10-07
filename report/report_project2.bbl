@@ -1,14 +1,18 @@
-\begin{thebibliography}{}
+\begin{thebibliography}{1}
+
+\bibitem{DDMatrix}
+Diagonally dominant matrix.
+\newblock \url{https://en.wikipedia.org/wiki/Diagonally_dominant_matrix}.
 
 \bibitem{Github}
-GitHub Repository\\
-\newblock \url{https://github.com/simennb/fys4150-project-2}
+Github.
+\newblock \url{https://github.com/simennb/fys4150-project-2}.
 
-\bibitem{Project}
+\bibitem{lecturenotes}
 Morten Hjorth-Jensen.
-\newblock Project 1.
+\newblock Lecture notes.
 \newblock
-  \url{https://github.com/CompPhysics/ComputationalPhysics/blob/master/doc/Projects/2016/Project1/project1_2016.pdf},
-  2016.
+  \url{https://github.com/CompPhysics/ComputationalPhysics/blob/master/doc/Lectures/lectures2015.pdf},
+  2015.
 
 \end{thebibliography}
